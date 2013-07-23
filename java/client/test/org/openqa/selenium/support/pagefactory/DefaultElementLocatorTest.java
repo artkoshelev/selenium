@@ -198,6 +198,20 @@ public class DefaultElementLocatorTest extends MockTestBase {
 
     locator.findElement();
   }
+  
+  @Test
+  public void shouldUseClassAnnotation() throws NoSuchFieldException, SecurityException {
+	  Field f = Page.class.getDeclaredField("byClassAnnotation");
+	  final WebDriver driver = mock(WebDriver.class);
+	  final By by = By.id("class_annotation");
+	  
+	  checking(new Expectations() {{
+		  exactly(1).of(driver).findElement(by);
+	  }});
+	  
+	  ElementLocator locator = newLocator(driver, f);
+	  locator.findElement();
+  }
 
   private static class Page {
     @SuppressWarnings("unused")
@@ -221,5 +235,12 @@ public class DefaultElementLocatorTest extends MockTestBase {
     @SuppressWarnings("unused")
     @FindBy(how = How.ID, using = "foo")
     private List<WebElement> listById;
+    
+    private ByClassAnnotation byClassAnnotation;
+    
+    @FindBy(id = "class_annotation")
+    private class ByClassAnnotation {
+    	
+    }
   }
 }
