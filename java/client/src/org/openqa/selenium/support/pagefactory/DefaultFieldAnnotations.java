@@ -43,10 +43,6 @@ public class DefaultFieldAnnotations extends Annotations {
 		if (ans == null && findBy != null) {
 			ans = buildByFromFindBy(findBy);
 		}
-		
-		if (ans == null) {
-			ans = buildByFromClassAnnotation();
-		}
 
 		if (ans == null) {
 			ans = buildByFromDefault();
@@ -57,17 +53,6 @@ public class DefaultFieldAnnotations extends Annotations {
 		}
 
 		return ans;
-	}
-	
-	protected By buildByFromClassAnnotation() {
-		Class<?> clazz = field.getClass();
-        while (clazz != Object.class) {
-            if (clazz.isAnnotationPresent(FindBys.class)) {
-            	FindBys findBys = clazz.getAnnotation(FindBys.class);
-                return buildByFromFindBys(findBys);
-            }
-            clazz = clazz.getSuperclass();
-        }
 	}
 
 	protected By buildByFromDefault() {
