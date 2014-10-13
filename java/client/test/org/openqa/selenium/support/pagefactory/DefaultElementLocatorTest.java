@@ -17,13 +17,16 @@ limitations under the License.
 package org.openqa.selenium.support.pagefactory;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.junit.Rule;
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
@@ -33,18 +36,12 @@ import org.openqa.selenium.support.CacheLookup;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.How;
 
-import org.junit.Test;
-
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.List;
-
 public class DefaultElementLocatorTest {
 
   protected ElementLocator newLocator(WebDriver driver, Field field) {
     return new DefaultElementLocator(driver, field);
   }
-
+  
   @Test
   public void shouldDelegateToDriverInstanceToFindElement() throws Exception {
     Field f = Page.class.getDeclaredField("first");
@@ -173,7 +170,7 @@ public class DefaultElementLocatorTest {
     locator.findElements();
   }
 
-  @Test
+  @Test(expected = NoSuchElementException.class)
   public void shouldNotMaskNoSuchElementExceptionIfThrown() throws Exception {
     Field f = Page.class.getDeclaredField("byId");
     final WebDriver driver = mock(WebDriver.class);
@@ -182,13 +179,19 @@ public class DefaultElementLocatorTest {
     when(driver.findElement(by)).thenThrow(new NoSuchElementException("Foo"));
 
     ElementLocator locator = newLocator(driver, f);
-
-    try {
-      locator.findElement();
-      fail("Should have allowed the exception to bubble up");
-    } catch (NoSuchElementException e) {
-      // This is expected
-    }
+    locator.findElement();
+  }
+  
+  @Test
+  public void shouldNotUseClassAnnotationByDefault() throws NoSuchFieldException, SecurityException {
+	  Field f = Page.class.getDeclaredField("byClassAnnotation");
+	  final WebDriver driver = mock(WebDriver.class);
+	  final By by = new ByIdOrName("byClassAnnotation");
+	  
+	  ElementLocator locator = newLocator(driver, f);
+	  locator.findElement();
+	  
+	  verify(driver, times(1)).findElement(by);
   }
 
   private static class Page {
@@ -213,5 +216,12 @@ public class DefaultElementLocatorTest {
     @SuppressWarnings("unused")
     @FindBy(how = How.ID, using = "foo")
     private List<WebElement> listById;
+    
+    private ByClassAnnotation byClassAnnotation;
+    
+    @FindBy(id = "class_annotation")
+    private class ByClassAnnotation {
+    	
+    }
   }
 }

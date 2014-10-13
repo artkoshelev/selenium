@@ -18,9 +18,11 @@ package org.openqa.selenium.support.pagefactory;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -32,22 +34,14 @@ import org.openqa.selenium.internal.FindsByLinkText;
 import org.openqa.selenium.internal.FindsByName;
 import org.openqa.selenium.internal.FindsByXPath;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class ByChainedTest {
-
-  @Test
+    
+  @Test(expected = NoSuchElementException.class)
   public void findElementZeroBy() {
     final AllDriver driver = mock(AllDriver.class);
 
     ByChained by = new ByChained();
-    try {
-      by.findElement(driver);
-      fail("Expected NoSuchElementException!");
-    } catch (NoSuchElementException e) {
-      // Expected
-    }
+    by.findElement(driver);
   }
 
   @Test
@@ -89,7 +83,7 @@ public class ByChainedTest {
     assertThat(by.findElements(driver), equalTo(elems12));
   }
 
-  @Test
+  @Test(expected = NoSuchElementException.class)
   public void findElementOneByEmpty() {
     final AllDriver driver = mock(AllDriver.class);
     final List<WebElement> elems = new ArrayList<WebElement>();
@@ -97,12 +91,7 @@ public class ByChainedTest {
     when(driver.findElementsByName("cheese")).thenReturn(elems);
 
     ByChained by = new ByChained(By.name("cheese"));
-    try {
-      by.findElement(driver);
-      fail("Expected NoSuchElementException!");
-    } catch (NoSuchElementException e) {
-      // Expected
-    }
+    by.findElement(driver);
   }
 
   @Test
@@ -144,7 +133,7 @@ public class ByChainedTest {
     assertThat(by.findElement(driver), equalTo(elem3));
   }
 
-  @Test
+  @Test(expected = NoSuchElementException.class)
   public void findElementTwoByEmptyParent() {
     final AllDriver driver = mock(AllDriver.class);
     final WebElement elem1 = mock(WebElement.class, "webElement1");
@@ -169,12 +158,7 @@ public class ByChainedTest {
     when(driver.findElementsByName("cheese")).thenReturn(elems);
 
     ByChained by = new ByChained(By.name("cheese"), By.name("photo"));
-    try {
-      by.findElement(driver);
-      fail("Expected NoSuchElementException!");
-    } catch (NoSuchElementException e) {
-      // Expected
-    }
+    by.findElement(driver);
   }
 
   @Test

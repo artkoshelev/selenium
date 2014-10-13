@@ -18,9 +18,11 @@ package org.openqa.selenium.support.pagefactory;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import org.junit.Test;
 import org.openqa.selenium.By;
@@ -32,22 +34,15 @@ import org.openqa.selenium.internal.FindsByLinkText;
 import org.openqa.selenium.internal.FindsByName;
 import org.openqa.selenium.internal.FindsByXPath;
 
-import java.util.ArrayList;
-import java.util.List;
 
 public class ByAllTest {
-
-  @Test
+    
+  @Test(expected = NoSuchElementException.class)
   public void findElementZeroBy() {
     final AllDriver driver = mock(AllDriver.class);
 
     ByAll by = new ByAll();
-    try {
-      by.findElement(driver);
-      fail("Expected NoSuchElementException!");
-    } catch (NoSuchElementException e) {
-      // Expected
-    }
+    by.findElement(driver);
   }
 
   @Test
@@ -89,7 +84,7 @@ public class ByAllTest {
     assertThat(by.findElements(driver), equalTo(elems12));
   }
 
-  @Test
+  @Test(expected = NoSuchElementException.class)
   public void findElementOneByEmpty() {
     final AllDriver driver = mock(AllDriver.class);
     final List<WebElement> elems = new ArrayList<WebElement>();
@@ -97,12 +92,7 @@ public class ByAllTest {
     when(driver.findElementsByName("cheese")).thenReturn(elems);
 
     ByAll by = new ByAll(By.name("cheese"));
-    try {
-      by.findElement(driver);
-      fail("Expected NoSuchElementException!");
-    } catch (NoSuchElementException e) {
-      // Expected
-    }
+    by.findElement(driver);
   }
 
   @Test
